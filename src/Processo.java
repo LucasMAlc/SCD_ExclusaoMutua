@@ -1,5 +1,10 @@
 import java.util.LinkedList;
 import java.util.Random;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 public class Processo {
 	
@@ -109,6 +114,38 @@ public class Processo {
 			@Override
 			public void run() {
 				System.out.println("Processo " + processo + " está consumindo o recurso.");
+				// txt
+				FileWriter writer = null;
+
+        		try {
+            		// Verifica se o arquivo já existe
+            		boolean arquivoExistente = true;
+            		if (!arquivoExistente) {
+                		// Cria um novo arquivo se não existir
+                		writer = new FileWriter("resultado.txt");
+            		} else {
+                		// Abre o arquivo existente para escrita
+                		writer = new FileWriter("resultado.txt", true);
+            		}
+
+            		// Chama a função para escrever no arquivo
+            		escreverNoArquivo(writer, "Processo " + processo +" consumiu recurso.");
+
+            		System.out.println("Escrita no arquivo concluída!");
+
+        		} catch (IOException e) {
+            		System.out.println("Ocorreu um erro ao escrever no arquivo: " + e.getMessage());
+        		} finally {
+            		// Fecha o arquivo
+            		if (writer != null) {
+                		try {
+                    		writer.close();
+                		} catch (IOException e) {
+                    		System.out.println("Ocorreu um erro ao fechar o arquivo: " + e.getMessage());
+                		}
+            		}
+        		}
+    	
 				setRecursoEmUso(true, processo);
 				
 				try {
@@ -121,6 +158,19 @@ public class Processo {
 		});
 		utilizaRecurso.start();
 	}
+
+	public static void escreverNoArquivo(FileWriter writer, String conteudo) throws IOException {
+        // Obtém a data e a hora atuais
+        Date dataAtual = new Date();
+        SimpleDateFormat formatoDataHora = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String dataHoraFormatada = formatoDataHora.format(dataAtual);
+
+        // Adiciona a data e a hora ao conteúdo
+        String conteudoComDataHora = "[" + dataHoraFormatada + "] " + conteudo;
+
+        // Escreve o conteúdo no arquivo
+        writer.write(conteudoComDataHora + "\n");
+    }
 	
 	private void liberarRecurso() {
 		setRecursoEmUso(false, this);
