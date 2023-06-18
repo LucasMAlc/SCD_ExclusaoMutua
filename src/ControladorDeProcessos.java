@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 
-
 public class ControladorDeProcessos {
 
 	private static ArrayList<Processo> processosAtivos = new ArrayList<Processo>();
@@ -12,6 +11,10 @@ public class ControladorDeProcessos {
 	}
 	
 	public static ArrayList<Processo> getProcessosAtivos() {
+		return processosAtivos;
+	}
+
+	public static ArrayList<Processo> processosAtendidos() {
 		return processosAtivos;
 	}
 	
