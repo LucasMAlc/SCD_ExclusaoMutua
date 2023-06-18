@@ -137,17 +137,17 @@ public class Main {
                 do {
                     Scanner x = new Scanner(System.in);
 
-                    System.out.println("Qual opçao voce deseja?");
+                    System.out.println("Qual opcao voce deseja? [1]Lista de Processos [2]Lista de interacoes [3]Sair");
                     opcao = x.nextInt();
 
                     switch (opcao) {
                         case 1:
-                            System.out.println("Processos " + ControladorDeProcessos.getProcessosAtivos());
+                            System.out.println("Processos Ativos: " + ControladorDeProcessos.getProcessosAtivos());
                             break;
 
                         case 2:
                             System.out.println("Processos " + Processo.getProcessosAtendidos());
-                            System.out.println("Execuções " + Processo.getQtdAtendimentos());
+                            System.out.println("Execucoes " + Processo.getQtdAtendimentos());
                             break;
 
                         case 3:

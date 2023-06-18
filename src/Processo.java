@@ -8,8 +8,10 @@ import java.util.ArrayList;
 
 public class Processo {
 	
-	String nomeArquivo = "Processo.txt";
+	// arquivos que serão atualizados
+	String resultadoTxt = "resultado.txt";
 	String logCoordenadorTxt = "logCoordenador.txt";
+
 	private int pid;
 	private boolean ehCoordenador = false;
 	private Thread utilizaRecurso = new Thread();
@@ -45,13 +47,13 @@ public class Processo {
 			conexao.conectar(this);
 			
 			if(ControladorDeProcessos.isSendoConsumido())
-				ControladorDeProcessos.getConsumidor().interronperAcessoRecurso();
+				ControladorDeProcessos.getConsumidor().interromperAcessoRecurso();
 			
 			recursoEmUso = false;
 		}
 	}
 	
-	private void interronperAcessoRecurso() {
+	private void interromperAcessoRecurso() {
 		if(utilizaRecurso.isAlive())
 			utilizaRecurso.interrupt();
 	}
@@ -64,11 +66,11 @@ public class Processo {
 		Processo coordenador = encontrarCoordenador();		
 		coordenador.recursoEmUso = estaEmUso;
 		ControladorDeProcessos.setConsumidor(estaEmUso ? consumidor : null);
-		
+		// escreve no resultado.txt
 		try {
 			String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Calendar.getInstance().getTime());
-			FileWriter myWriter = new FileWriter(nomeArquivo, true);
-			myWriter.write("Processo " + consumidor + " esta consumindo o recurso em: " + timeStamp + "\n");
+			FileWriter myWriter = new FileWriter(resultadoTxt, true);
+			myWriter.write("[" + timeStamp +"]: Processo " + consumidor + " esta consumindo recurso. \n");
 			myWriter.close();
 
 			int aux = totalProcessos.indexOf(consumidor.getPid());
@@ -116,29 +118,31 @@ public class Processo {
 		if(ControladorDeProcessos.isUsandoRecurso(this) || this.isCoordenador()){
 			return;
 		}
+
+		// escreve a primeira interacao logCoordenador.txt
 		try {
 			String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Calendar.getInstance().getTime());
 			FileWriter logCoordenador = new FileWriter(logCoordenadorTxt, true);
 			ArrayList<String> mensagem2 = new ArrayList<String>();
 			mensagem2.add("1");
 			mensagem2.add(Integer.toString(this.getPid()));
-			logCoordenador.write("Mensagem: " + mensagem2 + " Horario: " + timeStamp + "\n");
+			logCoordenador.write("[" + timeStamp + "] log: " + mensagem2 +"\n");
 			logCoordenador.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		String resultado = conexao.realizarRequisicao("Processo " + this + " quer consumir o recurso.\n");
 	
 		if(resultado.equals(Conexao.PERMITIR_ACESSO)){
+			// escreve a segunda interacao logCoordenador.txt
 			try {
-				String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
-						.format(Calendar.getInstance().getTime());
+				String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Calendar.getInstance().getTime());
 				FileWriter logCoordenador = new FileWriter(logCoordenadorTxt, true);
 				ArrayList<String> mensagem = new ArrayList<String>();
 				mensagem.add("2");
 				mensagem.add(Integer.toString(this.getPid()));
-				logCoordenador.write("Mensagem: " + mensagem + " Horario: " + timeStamp + "\n");
+				logCoordenador.write("[" + timeStamp + "] log: " + mensagem +"\n");
 				logCoordenador.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -167,14 +171,14 @@ public class Processo {
 				try {
 					Thread.sleep(randomUsageTime);
 				} catch (InterruptedException e) { }
-				
+				// escreve a terceira interacao logCoordenador.txt
 				try {
 					String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Calendar.getInstance().getTime());
 					FileWriter logCoordenador = new FileWriter(logCoordenadorTxt, true);
 					ArrayList<String> mensagem = new ArrayList<String>();
 					mensagem.add("3");
 					mensagem.add(Integer.toString(processo.getPid()));
-					logCoordenador.write("Mensagem: " + mensagem + " Horario: " + timeStamp + "\n");
+					logCoordenador.write("[" + timeStamp + "] log: " + mensagem +"\n");
 					logCoordenador.close();
 				  } catch (IOException e) {
 					  e.printStackTrace();
@@ -200,7 +204,7 @@ public class Processo {
 		} else {
 			removerDaListaDeEspera(this);
 			if(ControladorDeProcessos.isUsandoRecurso(this)) {
-				interronperAcessoRecurso();
+				interromperAcessoRecurso();
 				liberarRecurso();
 			}
 		}

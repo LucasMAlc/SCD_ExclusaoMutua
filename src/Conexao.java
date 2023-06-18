@@ -29,12 +29,6 @@ public class Conexao {
 						// aguarda ate um cliente pedir por uma conexao
 						sock = listenSocket.accept();
 
-						// prepara um buffer para receber dados do cliente
-						InputStreamReader s = new InputStreamReader(sock.getInputStream());
-						BufferedReader rec = new BufferedReader(s);
-
-						// le os dados enviados pelo cliente
-						String rBuf = rec.readLine();
 						// coloca a resposta em um buffer e envia para o cliente
 						DataOutputStream d = new DataOutputStream(sock.getOutputStream());
 						String sBuf = "Error!\n";
